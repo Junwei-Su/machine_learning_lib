@@ -1,114 +1,52 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
 """
-一个简单的Python爬虫, 用于抓取豆瓣电影Top前100的电影的名称
+knn_cluster:
+start with y class
+given a new object x, find its closest k neighbors from the given class
+among the k neighbors, count the number from each class and label the new point
+with the class with most elements in that k neighbors
 
-Anthor: Andrew Liu
-Version: 0.0.1
-Date: 2014-12-04
-Language: Python2.7.8
-Editor: Sublime Text2
-Operate: 具体操作请看README.md介绍
+purpose:
+
+fucntions:
+
 """
+
 import string
-import re
-import urllib2
+import math
 
-class DouBanSpider(object) :
-    """类的简要说明
+class Point:
+    def __init__(self,label, x, y):
+        self.label, self.x, self.y = label, x, y
 
-    本类主要用于抓取豆瓣前100的电影名称
+
+class Knn_cluster(object):
     
-    Attributes:
-        page: 用于表示当前所处的抓取页面
-        cur_url: 用于表示当前争取抓取页面的url
-        datas: 存储处理好的抓取到的电影名称
-        _top_num: 用于记录当前的top号码
-    """
+    def __init__(self,cl):
+        self.classes_list = cl
 
-    def __init__(self) :
-        self.page = 1
-        self.cur_url = "http://movie.douban.com/top250?start={page}&filter=&type="
-        self.datas = []
-        self._top_num = 1
-        print "豆瓣电影爬虫准备就绪, 准备爬取数据..."
+    def distance(self, point1, point2):
+        x_diff      = abs(point1.x - point2.x)
+        y_diff      = abs(point1.y - point2.y)
+        square_sum  = math.pow(x_diff,2) + math.pow(x_diff,2)
+        return math.pow(square_sum,0.5)
 
-    def get_page(self, cur_page) :
-        """
-
-        根据当前页码爬取网页HTML
-
-        Args: 
-            cur_page: 表示当前所抓取的网站页码
-
-        Returns:
-            返回抓取到整个页面的HTML(unicode编码)
-
-        Raises:
-            URLError:url引发的异常
-        """
-        url = self.cur_url
-        try :
-            my_page = urllib2.urlopen(url.format(page = (cur_page - 1) * 25)).read().decode("utf-8")
-        except urllib2.URLError, e :
-            if hasattr(e, "code"):
-                print "The server couldn't fulfill the request."
-                print "Error code: %s" % e.code
-            elif hasattr(e, "reason"):
-                print "We failed to reach a server. Please check your url and read the Reason"
-                print "Reason: %s" % e.reason
-        return my_page
-
-    def find_title(self, my_page) :
-        """
-
-        通过返回的整个网页HTML, 正则匹配前100的电影名称
-
+    def knn(self,cl,np):
+        #how to find the k nearest point efficiently
         
-        Args:
-            my_page: 传入页面的HTML文本用于正则匹配
-        """
-        temp_data = []
-        movie_items = re.findall(r'<span.*?class="title">(.*?)</span>', my_page, re.S)
-        for index, item in enumerate(movie_items) :
-            if item.find("&nbsp") == -1 :
-                temp_data.append("Top" + str(self._top_num) + " " + item)
-                self._top_num += 1
-        self.datas.extend(temp_data)
-    
-    def start_spider(self) :
-        """
 
-        爬虫入口, 并控制爬虫抓取页面的范围
-        """
-        while self.page <= 4 :
-            my_page = self.get_page(self.page)
-            self.find_title(my_page)
-            self.page += 1
 
-def main() :
-    print """
-        ###############################
-            一个简单的豆瓣电影前100爬虫
-            Author: Andrew_liu
-            Version: 0.0.1
-            Date: 2014-12-04
-        ###############################
-    """
-    my_spider = DouBanSpider()
-    my_spider.start_spider()
-    for item in my_spider.datas :
-        print item
-    print "豆瓣爬虫爬取结束..."
+
+
+
+def main():
+    cl = []
+    p1   = Point("1",1,1)
+    p2   = Point("2",2,2)
+    test = Knn_cluster(cl)
+    dist = test.distance(p1,p2)
+    print(dist)
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
 
 
